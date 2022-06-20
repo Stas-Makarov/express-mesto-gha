@@ -2,7 +2,6 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .populate('owner')
     .then((cards) => res.status(200).send(cards))
     .catch(() => res.status(500).send({ message: 'Произошла внутренняя ошибка сервера' }));
 };
@@ -23,7 +22,7 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCardById = (req, res) => {
+module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
