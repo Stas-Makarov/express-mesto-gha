@@ -29,7 +29,7 @@ module.exports.deleteCard = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        res.send({ data: card });
+        res.status(200).send({ data: card });
       }
     })
     .catch((err) => {
