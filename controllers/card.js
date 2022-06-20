@@ -29,7 +29,7 @@ module.exports.deleteCard = (req, res) => {
         res.status(404).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.status(200).send({ message: 'Карточка была успешно удалена' });
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
