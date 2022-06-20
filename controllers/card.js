@@ -22,7 +22,7 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
@@ -53,7 +53,7 @@ module.exports.likeCard = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        res.status(200).send({ data: card });
+        res.status(200).send({ card });
       }
     })
     .catch((err) => {
@@ -75,7 +75,7 @@ module.exports.dislikeCard = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        res.status(200).send({ data: card });
+        res.status(200).send({ card });
       }
     })
     .catch((err) => {
