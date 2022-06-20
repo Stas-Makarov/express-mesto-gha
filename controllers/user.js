@@ -1,13 +1,13 @@
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
-  User.find({})
+  User.find({}, { name: 1, about: 1, avatar: 1 })
     .then((users) => res.send({ data: users }))
     .catch(() => res.status(500).send({ message: 'Произошлав ошибка' }));
 };
 
 module.exports.getUsersById = (req, res) => {
-  User.findById(req.params.userId)
+  User.findById(req.params.userId, { name: 1, about: 1, avatar: 1 })
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
@@ -35,7 +35,7 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.updateProfileUser = (req, res) => {
+module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -52,7 +52,7 @@ module.exports.updateProfileUser = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports.updateAvatarUser = (req, res) => {
+module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
