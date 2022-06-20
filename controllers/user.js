@@ -1,34 +1,38 @@
-const mongoose = require('mongoose');
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
+    .then((users) => res.send({ data: users }))
+    .catch(() => res.status(500).send({ message: 'Произошлав ошибка' }));
 };
 
 module.exports.getUsersById = (req, res) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.userId)) {
-    User.findById(req.params.userId)
-      .then((user) => {
-        if (user) {
-          res.status(200)
-            .send({ data: user });
-        } else {
-          res.status(404).send({ message: 'Нет пользователя с таким id' });
-        }
-      })
-      .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
-  } else {
-    res.status(404).send({ message: 'Нет пользователя с таким id' });
-  }
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
+      } else {
+        res.send({ data: user });
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
+      }
+    });
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(201).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+      } else res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.updateProfileUser = (req, res) => {
@@ -40,9 +44,7 @@ module.exports.updateProfileUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res
-          .status(404)
-          .send({ message: 'Нет пользователя с таким id' });
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
         return;
       }
       res.status(200).send(user);
@@ -59,9 +61,7 @@ module.exports.updateAvatarUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res
-          .status(404)
-          .send({ message: 'Пользователь по указанному _id не найден' });
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
         return;
       }
       res.status(200).send(user);
