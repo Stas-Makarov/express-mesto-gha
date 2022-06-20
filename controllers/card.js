@@ -8,9 +8,10 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id })
+  const { _id } = req.user;
+  Card.create({ name, link, owner: _id })
     .then((card) => {
-      res.status(201).send({ card });
+      res.status(201).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -31,7 +32,7 @@ module.exports.deleteCard = (req, res) => {
       }
       return card.remove()
         .then(() => {
-          res.status(200).send({ message: 'Карточка удаленна' });
+          res.status(200).send({ data: card });
         });
     })
     .catch((err) => {
@@ -53,7 +54,7 @@ module.exports.likeCard = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        res.status(200).send({ card });
+        res.status(200).send({ data: card });
       }
     })
     .catch((err) => {
@@ -75,7 +76,7 @@ module.exports.dislikeCard = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        res.status(200).send({ card });
+        res.status(200).send({ data: card });
       }
     })
     .catch((err) => {
