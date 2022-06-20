@@ -23,18 +23,14 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.findById(req.params.cardId)
+module.exports.deleteCardById = (req, res) => {
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-      } if (card.owner._id.toString() !== req.user._id) {
-        res.status(403).send({ message: 'Невозможно удалить чужую карточку' });
+        res.status(404).send({ message: 'Карточка не найдена' });
+        return;
       }
-      return card.remove()
-        .then(() => {
-          res.status(200).send({ data: card });
-        });
+      res.status(200).send({ message: 'Карточка была успешно удалена' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -51,7 +47,6 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .populate('owner')
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
@@ -74,7 +69,6 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .populate('owner')
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
