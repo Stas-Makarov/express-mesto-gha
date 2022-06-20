@@ -8,12 +8,17 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
-  const likes = [];
-  Card.create({
-    name, link, owner, likes,
-  })
-    .then((card) => res.status(201).send({ data: card }))
+  Card.create({ name, link, owner: req.user._id })
+    .then((card) => {
+      res.status(200).send({
+        name: card.name,
+        about: card.about,
+        link: card.link,
+        owner: card.owner,
+        likes: card.likes,
+        _id: card._id,
+      });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
@@ -29,7 +34,7 @@ module.exports.deleteCard = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        res.status(200).send({ data: card });
+        res.status(500).send({ data: card });
       }
     })
     .catch((err) => {
