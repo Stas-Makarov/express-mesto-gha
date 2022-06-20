@@ -2,7 +2,7 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch(() => res.status(500).send({ message: 'Произошла внутренняя ошибка сервера' }));
 };
 
@@ -10,7 +10,14 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.status(200).send(card);
+      res.status(201).send({
+        name: card.name,
+        about: card.about,
+        link: card.link,
+        owner: card.owner,
+        likes: card.likes,
+        _id: card._id,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -27,7 +34,7 @@ module.exports.deleteCard = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        res.status(500).send({ data: card });
+        res.status(200).send({ data: card });
       }
     })
     .catch((err) => {
