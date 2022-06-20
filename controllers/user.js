@@ -30,8 +30,12 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-      } else res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(400).send({
+          message: 'Переданы некорректные данные при создании пользователя',
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию' });
+      }
     });
 };
 
@@ -49,7 +53,15 @@ module.exports.updateProfile = (req, res) => {
       }
       res.status(200).send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные при обновлении профиля',
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию' });
+      }
+    });
 };
 
 module.exports.updateAvatar = (req, res) => {
@@ -66,5 +78,13 @@ module.exports.updateAvatar = (req, res) => {
       }
       res.status(200).send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные при обновлении аватара',
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию' });
+      }
+    });
 };
