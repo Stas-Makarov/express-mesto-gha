@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const cardSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: 2,
@@ -17,8 +17,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   likes: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    type: mongoose.Schema.Types.Array,
     default: [],
   },
   createdAt: {
@@ -27,4 +26,4 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('card', userSchema);
+module.exports = mongoose.model('card', cardSchema);
