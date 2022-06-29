@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/user');
-const { auth } = require('./middlewares/auth');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -31,7 +30,7 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use(auth);
+app.use('/', require('./middlewares/auth'));
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
