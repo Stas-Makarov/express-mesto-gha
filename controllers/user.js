@@ -119,7 +119,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (!user) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
-      return resюstatus(200).send({ data: user });
+      return res.status(200).send({ data: user });
     })
     .catch((err) => next(err));
 };
