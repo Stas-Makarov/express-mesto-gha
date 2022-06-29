@@ -24,16 +24,16 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/),
+    avatar: Joi.string().pattern(/^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(4),
   }),
 }), createUser);
 
-app.use(require('./middlewares/auth'));
+app.use('/', require('./middlewares/auth'));
 
-app.use('/', require('./routes/users'));
-app.use('/', require('./routes/cards'));
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
