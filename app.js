@@ -30,12 +30,10 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('/', require('./middlewares/auth'));
+app.use('/users', require('./middlewares/auth'), require('./routes/users'));
+app.use('/cards', require('./middlewares/auth'), require('./routes/cards'));
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
-
-app.use((err, req, res, next) => {
+app.use('/*', require('./middlewares/auth'), (err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({ message: statusCode === 500 ? 'Ошибка сервера' : message });
   next();
