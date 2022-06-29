@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/user');
+const { auth } = require('./middlewares/auth');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -30,10 +31,16 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('/users', require('./middlewares/auth'), require('./routes/users'));
-app.use('/cards', require('./middlewares/auth'), require('./routes/cards'));
+app.use(auth);
 
-app.use('/*', require('./middlewares/auth'), (err, req, res, next) => {
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
+
+app.use('/*', (req, res) => {
+  res.status(404).send({ message: 'Not found' });
+});
+
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({ message: statusCode === 500 ? 'Ошибка сервера' : message });
   next();
