@@ -23,12 +23,12 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findById(req.params.cardId)
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Карточка не найдена' });
       }
-      if (card.owner === req.user._id) {
+      if (card.owner._id === req.user._id) {
         Card.findByIdAndRemove(card._id)
           .then(() => {
             res.status(200).send({ message: 'Картинка удалена' });
@@ -37,6 +37,8 @@ module.exports.deleteCard = (req, res) => {
         res.status(403).send({ message: 'Вы не можете удалить чужую карточку' });
       }
     })
+
+
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
