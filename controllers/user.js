@@ -116,10 +116,11 @@ module.exports.login = (req, res) => {
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
-      }
-      return res.status(200).send({ data: user });
+      // if (!user) {
+      //   res.status(404).send({ message: 'Нет пользователя с таким id' });
+      // }
+      // return
+      res.status(200).send({ data: user });
     })
     .catch((err) => next(err));
 };
