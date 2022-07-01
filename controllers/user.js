@@ -42,14 +42,14 @@ module.exports.createUser = (req, res) => {
         email: user.email,
       },
     }))
-    .catch(() => {
-      // if (err.name === 'ValidationError') {
-      //   res.status(400).send({
-      //     message: 'Переданы некорректные данные при создании пользователя',
-      //   });
-      // } else {
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
-      // }
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные при создании пользователя',
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию' });
+      }
     });
 };
 

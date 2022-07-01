@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { celebrate, Joi } = require('celebrate');
+const { errors, celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/user');
 const { auth } = require('./middlewares/auth');
 
@@ -45,6 +45,8 @@ app.use((err, req, res, next) => {
   res.status(statusCode).send({ message: statusCode === 500 ? 'Ошибка сервера' : message });
   next();
 });
+
+app.use(errors());
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
