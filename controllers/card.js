@@ -33,9 +33,6 @@ module.exports.deleteCard = (req, res) => {
             res.status(200).send({ message: 'Картинка удалена' });
           });
       }
-      // } else {
-      //   res.status(403).send({ message: 'Вы не можете удалить чужую карточку' });
-      // }
     })
     .catch((err) => {
       if (err.name === 'CastError') {

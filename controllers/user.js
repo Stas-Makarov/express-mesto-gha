@@ -17,13 +17,15 @@ module.exports.getUsersById = (req, res) => {
         res.status(200).send({ data: user });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-      } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
-      }
-    });
+    .catch(() => res.status(500).send({ message: 'Произошлав ошибка' }));
+
+  // .catch((err) => {
+  //   if (err.name === 'CastError') {
+  //     res.status(400).send({ message: 'Переданы некорректные данные' });
+  //   } else {
+  //     res.status(500).send({ message: 'Произошла ошибка' });
+  //   }
+  // });
 };
 
 module.exports.createUser = (req, res) => {
