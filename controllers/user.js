@@ -3,13 +3,13 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
-  User.find({}, { name: 1, about: 1, avatar: 1 })
+  User.find({})
     .then((users) => res.status(200).send({ data: users }))
     .catch(() => res.status(500).send({ message: 'Произошлав ошибка' }));
 };
 
 module.exports.getUsersById = (req, res) => {
-  User.findById(req.params.userId, { name: 1, about: 1, avatar: 1 })
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
@@ -102,10 +102,10 @@ module.exports.login = (req, res) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
-      return res.cookie('jwt', token, {
+      res.cookie('jwt', token, {
         httpOnly: true,
-      })
-        .send({ token });
+      });
+      res.send({ token });
     })
     .catch(() => {
       res
