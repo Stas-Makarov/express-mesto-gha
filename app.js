@@ -39,14 +39,12 @@ app.use('/cards', require('./routes/cards'));
 app.use('/*', (req, res) => {
   res.status(404).send({ message: 'Not found' });
 });
-
+app.use(errors());
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({ message: statusCode === 500 ? 'Ошибка сервера' : message });
   next();
 });
-
-app.use(errors());
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
