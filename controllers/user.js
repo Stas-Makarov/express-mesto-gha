@@ -17,15 +17,13 @@ module.exports.getUsersById = (req, res) => {
         res.status(200).send({ data: user });
       }
     })
-    .catch(() => res.status(500).send({ message: 'Произошлав ошибка' }));
-
-  // .catch((err) => {
-  //   if (err.name === 'CastError') {
-  //     res.status(400).send({ message: 'Переданы некорректные данные' });
-  //   } else {
-  //     res.status(500).send({ message: 'Произошла ошибка' });
-  //   }
-  // });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
+      }
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -58,7 +56,7 @@ module.exports.updateProfile = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(400).send({ message: 'Нет пользователя с таким id' });
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
         return;
       }
       res.status(200).send(user);
