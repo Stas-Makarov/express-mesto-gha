@@ -57,7 +57,6 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
-        return;
       }
       res.status(200).send(user);
     })
