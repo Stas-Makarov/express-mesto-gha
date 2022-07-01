@@ -23,7 +23,7 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findById(req.params.cardId)
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Карточка не найдена' });
@@ -32,6 +32,8 @@ module.exports.deleteCard = (req, res) => {
           .then(() => {
             res.status(200).send({ message: 'Картинка удалена' });
           });
+      } else {
+        res.status(403).send({ message: 'Вы не можете удалить чужую карточку' });
       }
     })
     .catch((err) => {
