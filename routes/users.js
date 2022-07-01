@@ -1,9 +1,8 @@
 const usersRouter = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const {
   getUsers, getUsersById, updateProfile, updateAvatar, getCurrentUser,
 } = require('../controllers/user');
-const { celebrate, Joi, errors } = require('celebrate');
-const { isURL } = require('validator');
 
 usersRouter.get('/', getUsers);
 usersRouter.get('/me', getCurrentUser);
@@ -16,7 +15,7 @@ usersRouter.patch('/me', celebrate({
 }), updateProfile);
 usersRouter.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().[isURL, 'Ошибка валидации'],
+    avatar: Joi.string().pattern(/^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/),
   }),
 }), updateAvatar);
 
