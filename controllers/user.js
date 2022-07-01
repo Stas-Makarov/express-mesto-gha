@@ -116,7 +116,7 @@ module.exports.login = (req, res) => {
 module.exports.getCurrentUser = (req, res) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (!user) {
+      if (user === null) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
       res.status(200).send({ data: user });
