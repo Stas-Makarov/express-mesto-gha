@@ -113,14 +113,21 @@ module.exports.login = (req, res) => {
     });
 };
 
-module.exports.getCurrentUser = (req, res, next) => {
+module.exports.getCurrentUser = (req, res) => {
   User.findById(req.user._id)
     .then((user) => {
-      // if (!user) {
-      //   res.status(404).send({ message: 'Нет пользователя с таким id' });
-      // }
-      // return
+      if (!user) {
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
+      }
       res.status(200).send({ data: user });
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные',
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию' });
+      }
+    });
 };
