@@ -13,9 +13,8 @@ module.exports.getUsersById = (req, res) => {
     .then((user) => {
       if (user === null) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
-      } else {
-        res.status(200).send({ data: user });
       }
+      res.status(200).send({ data: user });
     })
     // .catch((err) => {
     //   if (err.name === 'CastError') {
