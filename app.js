@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const { errors, celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/user');
 const { auth } = require('./middlewares/auth');
+const regex = require('./utils/constans');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -25,7 +26,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/),
+    avatar: Joi.string().pattern(regex),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(4),
   }),

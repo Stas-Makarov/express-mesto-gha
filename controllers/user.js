@@ -1,25 +1,27 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../errors/NotFoundError');
+const EmaiUniquelError = require('../errors/EmailUniqueError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Произошлав ошибка' }));
+    .catch(next);
 };
 
-module.exports.getUsersById = (req, res) => {
+module.exports.getUsersById = (req, res, next) => {
   User.findById(req.params.userid)
     .then((user) => {
       if (user === null) {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       res.status(200).send({ data: user });
     })
-    .catch(() => res.status(500).send({ message: 'Произошлав ошибка' }));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -36,11 +38,11 @@ module.exports.createUser = (req, res) => {
       },
     }))
     .catch(() => {
-      res.status(409).send({ message: 'Этот Email уже используется' });
+      next(new EmaiUniquelError('Этот Email уже используется'));
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -49,22 +51,14 @@ module.exports.updateProfile = (req, res) => {
   )
     .then((user) => {
       if (user === null) {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
-      res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({
-          message: 'Переданы некорректные данные при обновлении профиля',
-        });
-      } else {
-        res.status(500).send({ message: 'Ошибка по умолчанию' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -73,54 +67,32 @@ module.exports.updateAvatar = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
-        return;
+        throw new NotFoundError('Пользователь по указанному _id не найден');
       }
-      res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({
-          message: 'Переданы некорректные данные при обновлении аватара',
-        });
-      } else {
-        res.status(500).send({ message: 'Ошибка по умолчанию' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
       res.cookie('jwt', token, {
+        maxAge: 3600000,
         httpOnly: true,
+        sameSite: true,
       });
       res.send({ token });
     })
-    .catch(() => {
-      res
-        .status(401)
-        .send({ message: 'Неверные почта или пароль' });
-    });
+    .catch(next);
 };
 
-module.exports.getCurrentUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (user === null) {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
-      }
       res.status(200).send({ data: user });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({
-          message: 'Переданы некорректные данные',
-        });
-      } else {
-        res.status(500).send({ message: 'Ошибка по умолчанию' });
-      }
-    });
+    .catch(next);
 };
