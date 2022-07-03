@@ -6,7 +6,6 @@ const { errors, celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/user');
 const { auth } = require('./middlewares/auth');
 const regex = require('./utils/constans');
-const emailRegex = require('./utils/constans');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -19,7 +18,7 @@ app.use(cookieParser());
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().pattern(emailRegex),
+    email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 }), login);
@@ -28,7 +27,7 @@ app.post('/signup', celebrate({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(regex),
-    email: Joi.string().required().pattern(emailRegex),
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(4),
   }),
 }), createUser);
