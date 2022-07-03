@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const EmaiUniquelError = require('../errors/EmailUniqueError');
+const ValidationError = require('../errors/ValidationError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -25,21 +26,33 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((user) => res.status(201).send({
-      message: {
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-      },
-    }))
-    .catch(() => {
-      next(new EmaiUniquelError('Этот Email уже используется'));
-    });
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new EmaiUniquelError('Этот Email уже используется');
+      }
+      bcrypt.hash(password, 10)
+        .then((hash) => User.create({
+          name, about, avatar, email, password: hash,
+        }))
+        .then((newUser) => {
+          res.status(201).send({
+            name: newUser.name,
+            about: newUser.about,
+            avatar: newUser.avatar,
+            email: newUser.email,
+            _id: newUser._id,
+          });
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new ValidationError('Переданы некорректные данные при создании пользователя.'));
+            return;
+          }
+          next(err);
+        });
+    })
+    .catch(next);
 };
 
 module.exports.updateProfile = (req, res, next) => {
@@ -80,7 +93,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, {
-        maxAge: 3600000,
+        maxAge: 3600000 * 24 * 7,
         httpOnly: true,
         sameSite: true,
       });
